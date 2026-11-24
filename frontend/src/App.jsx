@@ -6,7 +6,16 @@ function App() {
   const [destination, setDestination] = useState("");
   const [duration, setDuration] = useState("3 Days");
   const [budget, setBudget] = useState("₹10,000 - ₹20,000");
-
+  const [tripDate, setTripDate] = useState("");
+  const [travellers, setTravellers] = useState("2");
+  const [interests, setInterests] = useState([]);
+  const handleInterestChange = (interest) => {
+  setInterests((prev) =>
+    prev.includes(interest)
+      ? prev.filter((item) => item !== interest)
+      : [...prev, interest]
+  );
+};
   const destinations = [
     {
       name: "Coorg",
@@ -39,17 +48,34 @@ function App() {
   ];
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!destination.trim()) {
-      alert("Please enter a destination!");
-      return;
-    }
+  if (!destination.trim()) {
+    alert("Please enter a destination!");
+    return;
+  }
 
-    alert(
-      `Your trip request:\nDestination: ${destination}\nDuration: ${duration}\nBudget: ${budget}`
-    );
-  };
+  if (!tripDate) {
+    alert("Please select your travel date!");
+    return;
+  }
+
+  if (interests.length === 0) {
+    alert("Please select at least one interest!");
+    return;
+  }
+
+  alert(`
+  Your Trip Details:
+
+  Destination: ${destination}
+  Travel Date: ${tripDate}
+  Duration: ${duration}
+  Travellers: ${travellers}
+  Budget: ${budget}
+  Interests: ${interests.join(", ")}
+  `);
+};
 
   return (
     <div className="app">
@@ -116,58 +142,96 @@ function App() {
       </section>
 
       {/* TRIP PLANNER */}
-      <section className="planner-section" id="planner">
-        <div className="section-heading">
-          <p className="eyebrow">START YOUR JOURNEY</p>
-          <h2>Where do you want to go?</h2>
-          <p>Tell us your preferences and let AI plan your perfect trip.</p>
-        </div>
+     
+<form className="planner-form" onSubmit={handleSubmit}>
+  <div className="form-group">
+    <label>Destination</label>
+    <input
+      type="text"
+      placeholder="Where do you want to travel?"
+      value={destination}
+      onChange={(e) => setDestination(e.target.value)}
+    />
+  </div>
 
-        <form className="planner-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Destination</label>
+  <div className="form-group">
+    <label>Travel Date</label>
+    <input
+      type="date"
+      value={tripDate}
+      min={new Date().toLocaleDateString("en-CA")}
+      onChange={(e) => setTripDate(e.target.value)}
+    />
+  </div>
+
+  <div className="form-group">
+    <label>Duration</label>
+    <select
+      value={duration}
+      onChange={(e) => setDuration(e.target.value)}
+    >
+      <option>1 Day</option>
+      <option>2 Days</option>
+      <option>3 Days</option>
+      <option>5 Days</option>
+      <option>7 Days</option>
+      <option>10 Days</option>
+    </select>
+  </div>
+
+  <div className="form-group">
+    <label>Travellers</label>
+    <select
+      value={travellers}
+      onChange={(e) => setTravellers(e.target.value)}
+    >
+      <option value="1">1 Traveller</option>
+      <option value="2">2 Travellers</option>
+      <option value="3">3 Travellers</option>
+      <option value="4">4 Travellers</option>
+      <option value="5">5 Travellers</option>
+      <option value="6">6 Travellers</option>
+    </select>
+  </div>
+
+  <div className="form-group">
+    <label>Budget</label>
+    <select
+      value={budget}
+      onChange={(e) => setBudget(e.target.value)}
+    >
+      <option>Below ₹5,000</option>
+      <option>₹5,000 - ₹10,000</option>
+      <option>₹10,000 - ₹20,000</option>
+      <option>₹20,000 - ₹50,000</option>
+      <option>Above ₹50,000</option>
+    </select>
+  </div>
+
+  <div className="form-group interests-group">
+    <label>What interests you?</label>
+
+    <div className="interest-options">
+      {["Adventure", "Nature", "History", "Food", "Culture", "Relaxation"].map(
+        (interest) => (
+          <label className="interest-option" key={interest}>
             <input
-              type="text"
-              placeholder="Where do you want to travel?"
-              value={destination}
-              onChange={(e) => setDestination(e.target.value)}
+              type="checkbox"
+              checked={interests.includes(interest)}
+              onChange={() => handleInterestChange(interest)}
             />
-          </div>
+            {interest}
+          </label>
+        )
+      )}
+    </div>
+  </div>
 
-          <div className="form-group">
-            <label>Duration</label>
-            <select
-              value={duration}
-              onChange={(e) => setDuration(e.target.value)}
-            >
-              <option>1 Day</option>
-              <option>2 Days</option>
-              <option>3 Days</option>
-              <option>5 Days</option>
-              <option>7 Days</option>
-              <option>10 Days</option>
-            </select>
-          </div>
+  <button type="submit" className="primary-btn search-btn">
+    Generate Trip →
+  </button>
+</form>
 
-          <div className="form-group">
-            <label>Budget</label>
-            <select
-              value={budget}
-              onChange={(e) => setBudget(e.target.value)}
-            >
-              <option>Below ₹5,000</option>
-              <option>₹5,000 - ₹10,000</option>
-              <option>₹10,000 - ₹20,000</option>
-              <option>₹20,000 - ₹50,000</option>
-              <option>Above ₹50,000</option>
-            </select>
-          </div>
-
-          <button type="submit" className="primary-btn search-btn">
-            Generate Trip →
-          </button>
-        </form>
-      </section>
 
       {/* DESTINATIONS */}
       <section className="destinations-section" id="destinations">

@@ -79,6 +79,7 @@ function App() {
 
   return (
     <div className="app">
+         
       {/* NAVBAR */}
       <nav className="navbar">
         <a href="#" className="logo">

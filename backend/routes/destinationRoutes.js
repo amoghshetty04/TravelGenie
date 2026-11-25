@@ -23,15 +23,46 @@ router.post("/", async (req, res) => {
 });
 
 // Get all destinations
+
+// Get destinations with search and filters
 router.get("/", async (req, res) => {
     try {
-        const destinations = await Destination.find();
+        const { search, state, category } = req.query;
+
+        const filter = {};
+
+        // Search by destination name
+        if (search) {
+            filter.name = {
+                $regex: search,
+                $options: "i"
+            };
+        }
+
+        // Filter by state
+        if (state) {
+            filter.state = {
+                $regex: `^${state}$`,
+                $options: "i"
+            };
+        }
+
+        // Filter by category
+        if (category) {
+            filter.categories = {
+                $regex: category,
+                $options: "i"
+            };
+        }
+
+        const destinations = await Destination.find(filter);
 
         res.status(200).json({
             success: true,
             count: destinations.length,
             data: destinations
         });
+
     } catch (error) {
         res.status(500).json({
             success: false,
@@ -39,5 +70,6 @@ router.get("/", async (req, res) => {
         });
     }
 });
+
 
 module.exports = router;

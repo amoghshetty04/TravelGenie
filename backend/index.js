@@ -2,12 +2,15 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
+const destinationRoutes = require("./routes/destinationRoutes");
+const connectDB = require("./config/db");
 
 const app = express();
 
+// Middleware
 app.use(cors());
 app.use(express.json());
-
+app.use("/api/destinations", destinationRoutes);
 // Health check API
 app.get("/api/health", (req, res) => {
     res.status(200).json({
@@ -17,8 +20,20 @@ app.get("/api/health", (req, res) => {
     });
 });
 
+// Start server after database connection
 const PORT = process.env.PORT || 8000;
 
-app.listen(PORT, () => {
-    console.log(`TravelGenie server running on port ${PORT}`);
-});
+const startServer = async () => {
+    try {
+        await connectDB();
+
+        app.listen(PORT, () => {
+            console.log(`TravelGenie server running on port ${PORT}`);
+        });
+    } catch (error) {
+        console.error("Server startup failed:", error.message);
+        process.exit(1);
+    }
+};
+
+startServer();

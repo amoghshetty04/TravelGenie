@@ -21,6 +21,13 @@ function App() {
   const [selectedState, setSelectedState] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
 
+  // Pagination states
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalDestinations, setTotalDestinations] = useState(0);
+
+  const limit = 6;
+
   // Fetch destinations from backend
   useEffect(() => {
     const fetchDestinations = async () => {
@@ -30,17 +37,24 @@ function App() {
 
         const params = new URLSearchParams();
 
+        // Search
         if (search.trim()) {
           params.append("search", search.trim());
         }
 
+        // State filter
         if (selectedState) {
           params.append("state", selectedState);
         }
 
+        // Category filter
         if (selectedCategory) {
           params.append("category", selectedCategory);
         }
+
+        // Pagination
+        params.append("page", page);
+        params.append("limit", limit);
 
         const response = await fetch(
           `http://localhost:8000/api/destinations?${params.toString()}`
@@ -53,6 +67,8 @@ function App() {
         const result = await response.json();
 
         setDestinations(result.data || []);
+        setTotalPages(result.totalPages || 1);
+        setTotalDestinations(result.total || 0);
 
       } catch (err) {
         console.error("Error fetching destinations:", err);
@@ -63,7 +79,8 @@ function App() {
     };
 
     fetchDestinations();
-  }, [search, selectedState, selectedCategory]);
+
+  }, [search, selectedState, selectedCategory, page]);
 
   // Handle interest selection
   const handleInterestChange = (interest) => {
@@ -110,6 +127,25 @@ Interests: ${interests.join(", ")}
     setSearch("");
     setSelectedState("");
     setSelectedCategory("");
+    setPage(1);
+  };
+
+  // Reset pagination when searching
+  const handleSearchChange = (value) => {
+    setSearch(value);
+    setPage(1);
+  };
+
+  // Reset pagination when changing state
+  const handleStateChange = (value) => {
+    setSelectedState(value);
+    setPage(1);
+  };
+
+  // Reset pagination when changing category
+  const handleCategoryChange = (value) => {
+    setSelectedCategory(value);
+    setPage(1);
   };
 
   return (
@@ -312,7 +348,7 @@ Interests: ${interests.join(", ")}
             type="text"
             placeholder="Search destinations..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
           />
         </div>
 
@@ -321,7 +357,7 @@ Interests: ${interests.join(", ")}
 
           <select
             value={selectedState}
-            onChange={(e) => setSelectedState(e.target.value)}
+            onChange={(e) => handleStateChange(e.target.value)}
           >
             <option value="">All States</option>
             <option value="Karnataka">Karnataka</option>
@@ -333,7 +369,7 @@ Interests: ${interests.join(", ")}
 
           <select
             value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
+            onChange={(e) => handleCategoryChange(e.target.value)}
           >
             <option value="">All Categories</option>
             <option value="Nature">Nature</option>
@@ -400,6 +436,7 @@ Interests: ${interests.join(", ")}
                     className="explore-btn"
                     onClick={() => {
                       setDestination(place.name);
+
                       document
                         .getElementById("planner")
                         ?.scrollIntoView({ behavior: "smooth" });
@@ -414,6 +451,43 @@ Interests: ${interests.join(", ")}
           )}
 
         </div>
+
+        {/* PAGINATION */}
+        {!loading && !error && destinations.length > 0 && (
+          <div className="pagination">
+
+            <p>
+              Showing {destinations.length} of {totalDestinations} destinations
+            </p>
+
+            <div className="pagination-buttons">
+
+              <button
+                type="button"
+                className="explore-btn"
+                disabled={page === 1}
+                onClick={() => setPage((prev) => prev - 1)}
+              >
+                ← Previous
+              </button>
+
+              <span>
+                Page {page} of {totalPages}
+              </span>
+
+              <button
+                type="button"
+                className="explore-btn"
+                disabled={page >= totalPages}
+                onClick={() => setPage((prev) => prev + 1)}
+              >
+                Next →
+              </button>
+
+            </div>
+          </div>
+        )}
+
       </section>
 
       {/* AI FEATURE SECTION */}

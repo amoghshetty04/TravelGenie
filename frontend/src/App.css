@@ -545,3 +545,33 @@ a {
     grid-template-columns: 1fr;
   }
 }
+
+.pagination {
+  margin-top: 35px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.pagination p {
+  color: #666;
+  font-size: 14px;
+}
+
+.pagination-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.pagination-buttons span {
+  font-weight: 600;
+  color: #333;
+}
+
+.pagination-buttons button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

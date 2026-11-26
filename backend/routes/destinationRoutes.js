@@ -25,13 +25,31 @@ router.post("/", async (req, res) => {
 // Get all destinations
 
 // Get destinations with search and filters
+
 router.get("/", async (req, res) => {
     try {
         const { search, state, category } = req.query;
 
+        // Pagination
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = Math.min(
+            50,
+            Math.max(1, parseInt(req.query.limit) || 10)
+        );
+
+        const skip = (page - 1) * limit;
+
+        // Sorting
+        const allowedSortFields = ["name", "state", "createdAt"];
+        const sortField = allowedSortFields.includes(req.query.sort)
+            ? req.query.sort
+            : "createdAt";
+
+        const sortOrder = req.query.order === "desc" ? -1 : 1;
+
+        // Search and filters
         const filter = {};
 
-        // Search by destination name
         if (search) {
             filter.name = {
                 $regex: search,
@@ -39,7 +57,6 @@ router.get("/", async (req, res) => {
             };
         }
 
-        // Filter by state
         if (state) {
             filter.state = {
                 $regex: `^${state}$`,
@@ -47,7 +64,6 @@ router.get("/", async (req, res) => {
             };
         }
 
-        // Filter by category
         if (category) {
             filter.categories = {
                 $regex: category,
@@ -55,11 +71,20 @@ router.get("/", async (req, res) => {
             };
         }
 
-        const destinations = await Destination.find(filter);
+        // Fetch destinations
+        const destinations = await Destination.find(filter)
+            .sort({ [sortField]: sortOrder })
+            .skip(skip)
+            .limit(limit);
+
+        const total = await Destination.countDocuments(filter);
 
         res.status(200).json({
             success: true,
-            count: destinations.length,
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
             data: destinations
         });
 
@@ -70,6 +95,7 @@ router.get("/", async (req, res) => {
         });
     }
 });
+
 
 
 module.exports = router;

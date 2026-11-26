@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 
 function App() {
@@ -9,6 +9,36 @@ function App() {
   const [tripDate, setTripDate] = useState("");
   const [travellers, setTravellers] = useState("2");
   const [interests, setInterests] = useState([]);
+  const [destinations, setDestinations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+
+useEffect(() => {
+  const fetchDestinations = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:8000/api/destinations"
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch destinations");
+      }
+
+      const result = await response.json();
+
+      setDestinations(result.data);
+    } catch (err) {
+      console.error("Error fetching destinations:", err);
+      setError("Unable to load destinations. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchDestinations();
+}, []);
+
   const handleInterestChange = (interest) => {
   setInterests((prev) =>
     prev.includes(interest)
@@ -16,36 +46,7 @@ function App() {
       : [...prev, interest]
   );
 };
-  const destinations = [
-    {
-      name: "Coorg",
-      state: "Karnataka",
-      description: "Explore coffee plantations and misty hills.",
-      image:
-        "https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=800",
-    },
-    {
-      name: "Munnar",
-      state: "Kerala",
-      description: "Discover beautiful tea gardens and mountains.",
-      image:
-        "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=800",
-    },
-    {
-      name: "Jaipur",
-      state: "Rajasthan",
-      description: "Experience royal palaces and rich culture.",
-      image:
-        "https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?w=800",
-    },
-   {
-   name: "Hampi",
-    state: "Karnataka",
-    description: "Explore ancient temples and historic ruins.",
-    image:
-    "https://commons.wikimedia.org/wiki/Special:FilePath/Virupaksha%20temple%20among%20the%20ruins%20in%20Hampi.JPG?width=800",
-  },
-  ];
+  
 
   const handleSubmit = (e) => {
   e.preventDefault();
@@ -242,27 +243,45 @@ function App() {
           <p>Find inspiration for your next unforgettable journey.</p>
         </div>
 
-        <div className="destination-grid">
-          {destinations.map((place) => (
-            <article className="destination-card" key={place.name}>
-              <img src={place.image} alt={place.name} />
+       
+<div className="destination-grid">
+  {loading ? (
+    <p>Loading destinations...</p>
+  ) : error ? (
+    <p>{error}</p>
+  ) : destinations.length === 0 ? (
+    <p>No destinations found.</p>
+  ) : (
+    destinations.map((place) => (
+      <article className="destination-card" key={place._id}>
+        {place.imageUrl ? (
+          <img src={place.imageUrl} alt={place.name} />
+        ) : (
+          <div className="destination-image-placeholder">
+            Image coming soon
+          </div>
+        )}
 
-              <div className="destination-info">
-                <p>{place.state}, India</p>
-                <h3>{place.name}</h3>
-                <p className="destination-description">
-                  {place.description}
-                </p>
-                <button
-                  className="explore-btn"
-                  onClick={() => setDestination(place.name)}
-                >
-                  Explore Destination →
-                </button>
-              </div>
-            </article>
-          ))}
+        <div className="destination-info">
+          <p>{place.state}, India</p>
+          <h3>{place.name}</h3>
+
+          <p className="destination-description">
+            {place.description || "Discover this beautiful destination."}
+          </p>
+
+          <button
+            className="explore-btn"
+            onClick={() => setDestination(place.name)}
+          >
+            Explore Destination →
+          </button>
         </div>
+      </article>
+    ))
+  )}
+</div>
+
       </section>
 
       {/* AI FEATURE SECTION */}

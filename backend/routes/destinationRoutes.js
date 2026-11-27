@@ -22,6 +22,39 @@ router.post("/", async (req, res) => {
     }
 });
 
+// Update a destination
+router.patch("/:id", async (req, res) => {
+  try {
+    const updatedDestination = await Destination.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+        runValidators: true
+      }
+    );
+
+    if (!updatedDestination) {
+      return res.status(404).json({
+        success: false,
+        message: "Destination not found"
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Destination updated successfully",
+      data: updatedDestination
+    });
+
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
 // Get all destinations
 
 // Get destinations with search and filters

@@ -409,20 +409,33 @@ Interests: ${interests.join(", ")}
                 key={place._id}
               >
 
-                {place.imageUrl ? (
+                {/* IMAGE WITH FALLBACK */}
+                <div className="destination-image-container">
                   <img
-                    src={place.imageUrl}
+                    src={place.imageUrl || ""}
                     alt={place.name}
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                      e.currentTarget.nextElementSibling.style.display = "flex";
+                    }}
                   />
-                ) : (
+
                   <div className="destination-image-placeholder">
-                    Image coming soon
+                    Image unavailable
                   </div>
-                )}
+                </div>
 
                 <div className="destination-info">
-
                   <p>{place.state}, India</p>
+
+                  {/* CATEGORY BADGES */}
+                  <div className="category-badges">
+                    {place.categories?.map((category) => (
+                      <span className="category-badge" key={category}>
+                        {category}
+                      </span>
+                    ))}
+                  </div>
 
                   <h3>{place.name}</h3>
 

@@ -575,3 +575,104 @@ a {
   opacity: 0.4;
   cursor: not-allowed;
 }
+.category-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.category-badge {
+  background-color: #e8f3ec;
+  color: #286443;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+/* Make the application use the full screen width */
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  max-width: none;
+}
+
+.app {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+/* Remove width restrictions from common page containers */
+.container,
+.main-container,
+.page-container {
+  width: 100%;
+  max-width: 100%;
+}
+/* Destination card improvements */
+.destination-card {
+  overflow: hidden;
+  border-radius: 14px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.destination-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+/* Consistent image dimensions */
+.destination-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.destination-image-placeholder {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e8eee9;
+  color: #54705d;
+  font-size: 14px;
+}
+
+/* Consistent card content */
+.destination-info {
+  padding: 16px;
+}
+
+.destination-image-container {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  position: relative;
+}
+
+.destination-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.destination-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: #e8eee9;
+  color: #54705d;
+}

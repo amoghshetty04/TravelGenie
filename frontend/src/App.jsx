@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import "./App.css";
+import AttractionsMap from "./components/AttractionsMap";
 
 function App() {
   // Trip planner states
@@ -37,22 +38,18 @@ function App() {
 
         const params = new URLSearchParams();
 
-        // Search
         if (search.trim()) {
           params.append("search", search.trim());
         }
 
-        // State filter
         if (selectedState) {
           params.append("state", selectedState);
         }
 
-        // Category filter
         if (selectedCategory) {
           params.append("category", selectedCategory);
         }
 
-        // Pagination
         params.append("page", page);
         params.append("limit", limit);
 
@@ -69,7 +66,6 @@ function App() {
         setDestinations(result.data || []);
         setTotalPages(result.totalPages || 1);
         setTotalDestinations(result.total || 0);
-
       } catch (err) {
         console.error("Error fetching destinations:", err);
         setError("Unable to load destinations. Please try again.");
@@ -79,7 +75,6 @@ function App() {
     };
 
     fetchDestinations();
-
   }, [search, selectedState, selectedCategory, page]);
 
   // Handle interest selection
@@ -162,6 +157,7 @@ Interests: ${interests.join(", ")}
           <a href="#home">Home</a>
           <a href="#destinations">Explore</a>
           <a href="#planner">AI Trip Planner</a>
+          <a href="#map">Nearby Attractions</a>
           <a href="#about">About</a>
         </div>
 
@@ -331,7 +327,6 @@ Interests: ${interests.join(", ")}
         className="destinations-section"
         id="destinations"
       >
-
         <div className="section-heading">
           <p className="eyebrow">EXPLORE INDIA</p>
 
@@ -354,7 +349,6 @@ Interests: ${interests.join(", ")}
 
         {/* FILTERS */}
         <div className="destination-filters">
-
           <select
             value={selectedState}
             onChange={(e) => handleStateChange(e.target.value)}
@@ -387,28 +381,22 @@ Interests: ${interests.join(", ")}
           >
             Clear Filters
           </button>
-
         </div>
 
         {/* DESTINATION CARDS */}
         <div className="destination-grid">
-
           {loading ? (
             <p>Loading destinations...</p>
-
           ) : error ? (
             <p>{error}</p>
-
           ) : destinations.length === 0 ? (
             <p>No destinations found. Try different filters.</p>
-
           ) : (
             destinations.map((place) => (
               <article
                 className="destination-card"
                 key={place._id}
               >
-
                 {/* IMAGE WITH FALLBACK */}
                 <div className="destination-image-container">
                   <img
@@ -457,24 +445,20 @@ Interests: ${interests.join(", ")}
                   >
                     Explore Destination →
                   </button>
-
                 </div>
               </article>
             ))
           )}
-
         </div>
 
         {/* PAGINATION */}
         {!loading && !error && destinations.length > 0 && (
           <div className="pagination">
-
             <p>
               Showing {destinations.length} of {totalDestinations} destinations
             </p>
 
             <div className="pagination-buttons">
-
               <button
                 type="button"
                 className="explore-btn"
@@ -496,16 +480,31 @@ Interests: ${interests.join(", ")}
               >
                 Next →
               </button>
-
             </div>
           </div>
         )}
+      </section>
 
+      {/* OPENSTREETMAP ATTRACTIONS SECTION */}
+      <section className="attractions-section" id="map">
+        <div className="section-heading">
+          <p className="eyebrow">DISCOVER NEARBY PLACES</p>
+          <h2>Explore Attractions on Map</h2>
+          <p>
+            Discover museums, viewpoints, historic places and other
+            attractions around your destination.
+          </p>
+        </div>
+
+        <AttractionsMap
+          latitude={12.2958}
+          longitude={76.6394}
+          radius={5000}
+        />
       </section>
 
       {/* AI FEATURE SECTION */}
       <section className="ai-section" id="about">
-
         <div className="ai-content">
           <p className="eyebrow">
             TRAVEL SMARTER WITH AI
@@ -525,7 +524,6 @@ Interests: ${interests.join(", ")}
         </div>
 
         <div className="ai-features">
-
           <div className="feature-card">
             <span>✦</span>
             <h3>AI Trip Planner</h3>
@@ -549,13 +547,11 @@ Interests: ${interests.join(", ")}
             <h3>Travel Assistant</h3>
             <p>Get AI-powered answers to your travel questions.</p>
           </div>
-
         </div>
       </section>
 
       {/* FOOTER */}
       <footer className="footer">
-
         <a href="#home" className="logo">
           ✈ Travel<span>Genie</span>
         </a>
@@ -565,7 +561,6 @@ Interests: ${interests.join(", ")}
         <p className="copyright">
           © 2026 TravelGenie AI. All rights reserved.
         </p>
-
       </footer>
 
     </div>

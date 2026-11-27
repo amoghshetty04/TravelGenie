@@ -5,16 +5,30 @@ import {
   TileLayer,
   CircleMarker,
   Popup,
+  useMap,
 } from "react-leaflet";
 
 import "leaflet/dist/leaflet.css";
 
+// Automatically move map when destination changes
+function MapUpdater({ latitude, longitude }) {
+  const map = useMap();
+
+  useEffect(() => {
+    map.setView([latitude, longitude], 13);
+  }, [latitude, longitude, map]);
+
+  return null;
+}
+
 function AttractionsMap({ latitude, longitude, radius = 5000 }) {
   const [attractions, setAttractions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (latitude == null || longitude == null) return;
+
     const fetchAttractions = async () => {
       try {
         setLoading(true);
@@ -37,6 +51,7 @@ function AttractionsMap({ latitude, longitude, radius = 5000 }) {
         setAttractions(result.data || []);
       } catch (err) {
         setError(err.message);
+        setAttractions([]);
       } finally {
         setLoading(false);
       }
@@ -44,6 +59,10 @@ function AttractionsMap({ latitude, longitude, radius = 5000 }) {
 
     fetchAttractions();
   }, [latitude, longitude, radius]);
+
+  if (latitude == null || longitude == null) {
+    return <p>Select a destination to view nearby attractions.</p>;
+  }
 
   return (
     <div className="attractions-map-section">
@@ -59,6 +78,11 @@ function AttractionsMap({ latitude, longitude, radius = 5000 }) {
         scrollWheelZoom={true}
         style={{ height: "450px", width: "100%" }}
       >
+        <MapUpdater
+          latitude={latitude}
+          longitude={longitude}
+        />
+
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

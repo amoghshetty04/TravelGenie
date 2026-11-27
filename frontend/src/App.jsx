@@ -27,6 +27,13 @@ function App() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalDestinations, setTotalDestinations] = useState(0);
 
+  // Selected destination for map
+  const [selectedMapDestination, setSelectedMapDestination] = useState({
+    name: "Mysuru",
+    latitude: 12.2958,
+    longitude: 76.6394,
+  });
+
   const limit = 6;
 
   // Fetch destinations from backend
@@ -141,6 +148,35 @@ Interests: ${interests.join(", ")}
   const handleCategoryChange = (value) => {
     setSelectedCategory(value);
     setPage(1);
+  };
+
+  // Select destination and update map
+  const handleExploreDestination = (place) => {
+    const coordinates = place.location?.coordinates;
+
+    if (
+      !Array.isArray(coordinates) ||
+      coordinates.length !== 2 ||
+      !Number.isFinite(coordinates[0]) ||
+      !Number.isFinite(coordinates[1])
+    ) {
+      alert("Coordinates are unavailable for this destination.");
+      return;
+    }
+
+    setDestination(place.name);
+
+    // GeoJSON coordinates: [longitude, latitude]
+    setSelectedMapDestination({
+      name: place.name,
+      longitude: coordinates[0],
+      latitude: coordinates[1],
+    });
+
+    // Scroll to map
+    document
+      .getElementById("map")
+      ?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -299,7 +335,7 @@ Interests: ${interests.join(", ")}
               "History",
               "Food",
               "Culture",
-              "Relaxation"
+              "Relaxation",
             ].map((interest) => (
               <label className="interest-option" key={interest}>
                 <input
@@ -435,13 +471,7 @@ Interests: ${interests.join(", ")}
                   <button
                     type="button"
                     className="explore-btn"
-                    onClick={() => {
-                      setDestination(place.name);
-
-                      document
-                        .getElementById("planner")
-                        ?.scrollIntoView({ behavior: "smooth" });
-                    }}
+                    onClick={() => handleExploreDestination(place)}
                   >
                     Explore Destination →
                   </button>
@@ -489,16 +519,22 @@ Interests: ${interests.join(", ")}
       <section className="attractions-section" id="map">
         <div className="section-heading">
           <p className="eyebrow">DISCOVER NEARBY PLACES</p>
+
           <h2>Explore Attractions on Map</h2>
+
           <p>
             Discover museums, viewpoints, historic places and other
             attractions around your destination.
           </p>
+
+          <h3 style={{ marginTop: "20px" }}>
+            Attractions near {selectedMapDestination.name}
+          </h3>
         </div>
 
         <AttractionsMap
-          latitude={12.2958}
-          longitude={76.6394}
+          latitude={selectedMapDestination.latitude}
+          longitude={selectedMapDestination.longitude}
           radius={5000}
         />
       </section>

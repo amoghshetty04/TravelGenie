@@ -4,6 +4,7 @@ const cors = require("cors");
 require("dotenv").config();
 const osmRoutes = require("./routes/osmRoutes");
 const destinationRoutes = require("./routes/destinationRoutes");
+const aiRoutes = require("./routes/aiRoutes");
 const connectDB = require("./config/db");
 
 const app = express();
@@ -13,6 +14,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/api/destinations", destinationRoutes);
 app.use("/api/osm", osmRoutes);
+app.use("/api/ai", aiRoutes);
 // Health check API
 app.get("/api/health", (req, res) => {
     res.status(200).json({
